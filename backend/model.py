@@ -1,0 +1,1 @@
+"""File for our AI model if we end up creating our own model and training it. If not, will just use an API call to an LLM"""
