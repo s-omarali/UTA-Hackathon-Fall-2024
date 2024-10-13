@@ -55,75 +55,75 @@ function App() {
   };
 
   return (
-    <div className="App" style={{ padding: '20px', fontFamily: 'Arial, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div className="App p-5 font-sans flex flex-col items-center">
       <button className={`toggle-button ${darkMode ? 'dark' : ''} top-right`} onClick={toggleDarkMode}>
         Toggle Dark Mode
       </button>
-      <img src="/logo.png" alt="Logo" style={{ width: '150px', marginBottom: '20px' }} />
-      <h1 className="title">
+      <img src="/logo.png" alt="Logo" className="w-36 mb-5" />
+      <h1 className="title text-gray-800 text-4xl font-bold mb-5">
         Fake News Detection
       </h1>
-      <form onSubmit={handleSubmit} style={{ marginBottom: '20px', textAlign: 'center' }}>
+      <form onSubmit={handleSubmit} className="mb-5 text-center">
         <input
           type="text"
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="text-box focused-input"
+          className="text-box focused-input border p-2 mb-2 w-full"
         />
         <textarea
           placeholder="Paste article text here"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          className="text-box focused-input"
+          className="text-box focused-input border p-2 mb-2 w-full"
         />
-        <button type="submit" className="verify-button" title="Click to verify the article">
+        <button type="submit" className="verify-button bg-blue-500 text-white p-2 rounded" title="Click to verify the article">
           Verify
         </button>
-        <button type="button" onClick={handleClear} className="clear-button" title="Click to clear the input fields">
+        <button type="button" onClick={handleClear} className="clear-button bg-red-500 text-white p-2 rounded ml-2" title="Click to clear the input fields">
           Clear
         </button>
       </form>
-      {loading && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px' }}><PuffLoader color="#4caf50" size={60} /></div>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {loading && <div className="flex justify-center items-center h-24"><PuffLoader color="#4caf50" size={60} /></div>}
+      {error && <p className="text-red-500">{error}</p>}
       {result && (
-        <p>
-          {result === 'Real News' ? <FaCheckCircle style={{ marginRight: '5px' }} /> : <FaTimesCircle style={{ marginRight: '5px' }} />}
+        <p className="text-lg">
+          {result === 'Real News' ? <FaCheckCircle className="inline mr-1" /> : <FaTimesCircle className="inline mr-1" />}
           {result}
         </p>
       )}
       
-      <div style={{ marginTop: '40px', textAlign: 'center' }}>
-        <h2>History</h2>
+      <div className="mt-10 text-center">
+        <h2 className="text-2xl font-bold">History</h2>
         {history.map((item, index) => (
-          <div key={index} className="history-card">
+          <div key={index} className="history-card border p-3 mb-2">
             <strong>Title:</strong> {item.title}<br />
             <strong>Content:</strong> {item.content}<br />
-            <strong>Result:</strong> <span style={{ color: item.result === 'Real News' ? 'green' : 'red' }}>{item.result}</span>
+            <strong>Result:</strong> <span className={item.result === 'Real News' ? 'text-green-500' : 'text-red-500'}>{item.result}</span>
           </div>
         ))}
       </div>
-      <button onClick={toggleFAQ} style={{ marginTop: '20px' }}>
+      <button onClick={toggleFAQ} className="mt-5 bg-gray-500 text-white p-2 rounded">
         {showFAQ ? 'Hide FAQ' : 'Show FAQ'}
       </button>
       {showFAQ && (
-        <div className="faq-section" style={{ marginTop: '20px', textAlign: 'left', maxWidth: '600px' }}>
-          <h2>FAQ</h2>
+        <div className="faq-section mt-5 text-left max-w-xl">
+          <h2 className="text-2xl font-bold">FAQ</h2>
           <div>
-            <h3><FaQuestionCircle style={{ marginRight: '5px' }} /> What is this app?</h3>
+            <h3 className="text-xl font-semibold"><FaQuestionCircle className="inline mr-1" /> What is this app?</h3>
             <p>This app helps you verify whether a news article is fake or real.</p>
           </div>
           <div>
-            <h3><FaCog style={{ marginRight: '5px' }} /> How does it work?</h3>
+            <h3 className="text-xl font-semibold"><FaCog className="inline mr-1" /> How does it work?</h3>
             <p>You paste the title and content of the article, and the app will analyze it to determine if it's fake or real.</p>
           </div>
           <div>
-            <h3><FaCheckCircle style={{ marginRight: '5px' }} /> Is the verification accurate?</h3>
+            <h3 className="text-xl font-semibold"><FaCheckCircle className="inline mr-1" /> Is the verification accurate?</h3>
             <p>While the app uses advanced algorithms to verify news, no verification system is 100% accurate. Always use multiple sources to confirm the authenticity of news.</p>
           </div>
         </div>
       )}
-      <footer style={{ marginTop: '40px', padding: '10px', borderTop: '1px solid #ccc', textAlign: 'center' }}>
+      <footer className="mt-10 p-3 border-t text-center">
         <p>&copy; 2024 Fake News Detection App. All rights reserved.</p>
       </footer>
     </div>
