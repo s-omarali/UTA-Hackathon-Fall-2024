@@ -66,12 +66,12 @@
 }
 
 body.light-mode {
-  background-color: #ffffff;
+  background-color: #b6e1e8;
   color: #000000;
 }
 
 body.dark-mode {
-  background-color: #121212;
+  background-color: #000000;
   color: #ffffff;
 }
 
@@ -89,7 +89,7 @@ button.toggle-button {
 }
 
 button.toggle-button.dark {
-  background-color: #333;
+  background-color: #1c1b1b;
   color: white;
 }
 
