@@ -61,7 +61,7 @@ function App() {
       </button>
       <img src="/logo.png" alt="Logo" style={{ width: '150px', marginBottom: '20px' }} />
       <h1 className="title">
-        Fake News Verification
+        Fake News Detection
       </h1>
       <form onSubmit={handleSubmit} style={{ marginBottom: '20px', textAlign: 'center' }}>
         <input
@@ -87,11 +87,7 @@ function App() {
       {loading && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px' }}><PuffLoader color="#4caf50" size={60} /></div>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {result && (
-        <p style={{
-          animation: 'fadeIn 1s',
-          fontWeight: 'bold',
-          color: result === 'Real News' ? 'green' : 'red'
-        }}>
+        <p>
           {result === 'Real News' ? <FaCheckCircle style={{ marginRight: '5px' }} /> : <FaTimesCircle style={{ marginRight: '5px' }} />}
           {result}
         </p>
@@ -107,7 +103,6 @@ function App() {
           </div>
         ))}
       </div>
-
       <button onClick={toggleFAQ} style={{ marginTop: '20px' }}>
         {showFAQ ? 'Hide FAQ' : 'Show FAQ'}
       </button>
@@ -128,9 +123,8 @@ function App() {
           </div>
         </div>
       )}
-
       <footer style={{ marginTop: '40px', padding: '10px', borderTop: '1px solid #ccc', textAlign: 'center' }}>
-        <p>&copy; 2024 Fake News Verification App. All rights reserved.</p>
+        <p>&copy; 2024 Fake News Detection App. All rights reserved.</p>
       </footer>
     </div>
   );
