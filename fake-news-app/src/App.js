@@ -1,39 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import './App.css'; // Import the CSS file
-import { PuffLoader } from 'react-spinners'; // Using react-spinners for loading animation
-import { FaQuestionCircle, FaCog, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'; // Importing icons for FAQ
+import { PuffLoader } from 'react-spinners';
+import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 
 function App() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState('');
   const [history, setHistory] = useState([]);
-  const [darkMode, setDarkMode] = useState(false);
   const [showFAQ, setShowFAQ] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
-  useEffect(() => {
-    document.body.className = darkMode ? 'dark-mode' : 'light-mode';
-  }, [darkMode]);
+  const toggleDarkMode = () => setDarkMode(!darkMode);
+  const toggleFAQ = () => setShowFAQ(!showFAQ);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title || !content) {
-      setError('Title and content cannot be empty.');
-      return;
-    }
     setLoading(true);
-    setError(null);
+    setError('');
+    setResult('');
     try {
-      const response = await axios.post('http://localhost:8000/verify/', { title, content });
-      const verificationResult = response.data.is_fake ? 'Fake News' : 'Real News';
-      setResult(verificationResult);
-      setHistory([...history, { title, content, result: verificationResult }]);
+      const response = await axios.post('http://localhost:8000/classify/', { text: content });
+      setResult(response.data.result);
+      setHistory([...history, { title, content, result: response.data.result }]);
     } catch (error) {
-      setError('An error occurred while verifying the news.');
-      console.error(error);
+      console.error('Error classifying text:', error);
+      setError('Error classifying text');
     } finally {
       setLoading(false);
     }
@@ -42,20 +36,12 @@ function App() {
   const handleClear = () => {
     setTitle('');
     setContent('');
-    setResult(null);
-    setError(null);
-  };
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
-
-  const toggleFAQ = () => {
-    setShowFAQ(!showFAQ);
+    setResult('');
+    setError('');
   };
 
   return (
-    <div className="App p-5 font-sans flex flex-col items-center">
+    <div className={`App ${darkMode ? 'dark-mode' : ''}`}>
       <button className={`toggle-button ${darkMode ? 'dark' : ''} top-right`} onClick={toggleDarkMode}>
         Toggle Dark Mode
       </button>
@@ -88,7 +74,7 @@ function App() {
       {error && <p className="text-red-500">{error}</p>}
       {result && (
         <p className="text-lg">
-          {result === 'Real News' ? <FaCheckCircle className="inline mr-1" /> : <FaTimesCircle className="inline mr-1" />}
+          {result === 'True News' ? <FaCheckCircle className="inline mr-1" /> : <FaTimesCircle className="inline mr-1" />}
           {result}
         </p>
       )}
@@ -99,7 +85,7 @@ function App() {
           <div key={index} className="history-card border p-3 mb-2">
             <strong>Title:</strong> {item.title}<br />
             <strong>Content:</strong> {item.content}<br />
-            <strong>Result:</strong> <span className={item.result === 'Real News' ? 'text-green-500' : 'text-red-500'}>{item.result}</span>
+            <strong>Result:</strong> <span className={item.result === 'True News' ? 'text-green-500' : 'text-red-500'}>{item.result}</span>
           </div>
         ))}
       </div>
@@ -109,23 +95,9 @@ function App() {
       {showFAQ && (
         <div className="faq-section mt-5 text-left max-w-xl">
           <h2 className="text-2xl font-bold">FAQ</h2>
-          <div>
-            <h3 className="text-xl font-semibold"><FaQuestionCircle className="inline mr-1" /> What is this app?</h3>
-            <p>This app helps you verify whether a news article is fake or real.</p>
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold"><FaCog className="inline mr-1" /> How does it work?</h3>
-            <p>You paste the title and content of the article, and the app will analyze it to determine if it's fake or real.</p>
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold"><FaCheckCircle className="inline mr-1" /> Is the verification accurate?</h3>
-            <p>While the app uses advanced algorithms to verify news, no verification system is 100% accurate. Always use multiple sources to confirm the authenticity of news.</p>
-          </div>
+          {/* Add FAQ content here */}
         </div>
       )}
-      <footer className="mt-10 p-3 border-t text-center">
-        <p>&copy; 2024 Fake News Detection App. All rights reserved.</p>
-      </footer>
     </div>
   );
 }

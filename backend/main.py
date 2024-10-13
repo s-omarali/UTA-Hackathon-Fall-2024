@@ -1,23 +1,50 @@
-from fastapi import FastAPI, HTTPException #the backend were using for 
-from pydantic import BaseModel # used to ensure data types (like in c: we need to make sure certain data is int,str,etc)
-import joblib #going to use this to save and load our trained AI model
-import os #accessing operating system, used for accessing folders for paths and things
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+import torch
 
 app = FastAPI()
 
-# Load your pre-trained model
-#model = joblib.load('')
+# Configure CORS
+origins = [
+    "http://localhost:3000",  # React frontend
+]
 
-class NewsArticle(BaseModel):  # defining the news aricle model which will be the user input data
-    title: str
-    content: str
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.post("/verify/")  # Our API endpoint  # /verify is a POST endpoint 
-async def verify_news(article: NewsArticle): # accepting NewsArticle object 
-    
-     #prediction = model.predict([article.content])   #
-     return {"is_fake": False, "message": "Model not done yet" }   # here will be the json response from the AI model if the news is fake. 0 for fake 1 for real
+# Load the fine-tuned model and tokenizer
+model_path = './fake_news_model'
+tokenizer = DistilBertTokenizer.from_pretrained(model_path)
+model = DistilBertForSequenceClassification.from_pretrained(model_path)
 
-if __name__ == "__main__":   #check if script is run directly
-    import uvicorn # the server for FastAPI
-    uvicorn.run(app, host="0.0.0.0", port=8000)  #runs the app on all available IP addresses which is why we use 0.0.0.0.
+class TextInput(BaseModel):
+    text: str
+
+@app.post("/classify/")
+async def classify_text(input: TextInput):
+    # Tokenize the input text
+    inputs = tokenizer(input.text, return_tensors="pt", truncation=True, padding=True, max_length=512)
+
+    # Make predictions
+    model.eval()  # Set the model to evaluation mode
+    with torch.no_grad():
+        outputs = model(**inputs)
+
+    # Get the predicted label
+    predictions = torch.argmax(outputs.logits, dim=-1)
+    label = predictions.item()
+
+    # Interpret the results
+    result = "True News" if label == 0 else "Fake News"
+    return {"result": result}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
