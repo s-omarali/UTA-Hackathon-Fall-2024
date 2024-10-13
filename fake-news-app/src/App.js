@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css'; // Import the CSS file
 import { PuffLoader } from 'react-spinners'; // Using react-spinners for loading animation
+import { FaQuestionCircle, FaCog, FaCheckCircle, FaTimesCircle } from 'react-icons/fa'; // Importing icons for FAQ
 
 function App() {
   const [title, setTitle] = useState('');
@@ -11,6 +12,7 @@ function App() {
   const [error, setError] = useState(null);
   const [history, setHistory] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
+  const [showFAQ, setShowFAQ] = useState(false);
 
   useEffect(() => {
     document.body.className = darkMode ? 'dark-mode' : 'light-mode';
@@ -48,6 +50,10 @@ function App() {
     setDarkMode(!darkMode);
   };
 
+  const toggleFAQ = () => {
+    setShowFAQ(!showFAQ);
+  };
+
   return (
     <div className="App" style={{ padding: '20px', fontFamily: 'Arial, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <button className={`toggle-button ${darkMode ? 'dark' : ''} top-right`} onClick={toggleDarkMode}>
@@ -80,20 +86,48 @@ function App() {
       </form>
       {loading && <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100px' }}><PuffLoader color="#4caf50" size={60} /></div>}
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      {result && <p>{result}</p>}
+      {result && (
+        <p style={{
+          animation: 'fadeIn 1s',
+          fontWeight: 'bold',
+          color: result === 'Real News' ? 'green' : 'red'
+        }}>
+          {result === 'Real News' ? <FaCheckCircle style={{ marginRight: '5px' }} /> : <FaTimesCircle style={{ marginRight: '5px' }} />}
+          {result}
+        </p>
+      )}
       
       <div style={{ marginTop: '40px', textAlign: 'center' }}>
         <h2>History</h2>
-        <div className="history-container">
-          {history.map((item, index) => (
-            <div key={index} className="history-card">
-              <strong>Title:</strong> {item.title}<br />
-              <strong>Content:</strong> {item.content}<br />
-              <strong>Result:</strong> {item.result}
-            </div>
-          ))}
-        </div>
+        {history.map((item, index) => (
+          <div key={index} className="history-card">
+            <strong>Title:</strong> {item.title}<br />
+            <strong>Content:</strong> {item.content}<br />
+            <strong>Result:</strong> <span style={{ color: item.result === 'Real News' ? 'green' : 'red' }}>{item.result}</span>
+          </div>
+        ))}
       </div>
+
+      <button onClick={toggleFAQ} style={{ marginTop: '20px' }}>
+        {showFAQ ? 'Hide FAQ' : 'Show FAQ'}
+      </button>
+      {showFAQ && (
+        <div className="faq-section" style={{ marginTop: '20px', textAlign: 'left', maxWidth: '600px' }}>
+          <h2>FAQ</h2>
+          <div>
+            <h3><FaQuestionCircle style={{ marginRight: '5px' }} /> What is this app?</h3>
+            <p>This app helps you verify whether a news article is fake or real.</p>
+          </div>
+          <div>
+            <h3><FaCog style={{ marginRight: '5px' }} /> How does it work?</h3>
+            <p>You paste the title and content of the article, and the app will analyze it to determine if it's fake or real.</p>
+          </div>
+          <div>
+            <h3><FaCheckCircle style={{ marginRight: '5px' }} /> Is the verification accurate?</h3>
+            <p>While the app uses advanced algorithms to verify news, no verification system is 100% accurate. Always use multiple sources to confirm the authenticity of news.</p>
+          </div>
+        </div>
+      )}
 
       <footer style={{ marginTop: '40px', padding: '10px', borderTop: '1px solid #ccc', textAlign: 'center' }}>
         <p>&copy; 2024 Fake News Verification App. All rights reserved.</p>
