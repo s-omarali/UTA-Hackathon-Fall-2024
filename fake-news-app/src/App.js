@@ -20,14 +20,11 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!title || !content) {
-      setError('Title and content cannot be empty.');
-      return;
-    }
+    
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.post('http://localhost:8000/verify/', { title, content });
+      const response = await axios.post('http://localhost:8000/classify/', { text: content });
       const verificationResult = response.data.is_fake ? 'Fake News' : 'Real News';
       setResult(verificationResult);
       setHistory([...history, { title, content, result: verificationResult }]);

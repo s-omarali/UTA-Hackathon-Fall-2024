@@ -1,16 +1,13 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 import torch
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Configure CORS
-origins = [
-    "http://localhost:3000",  # React frontend
-]
-
+# Allow CORS for all origins
+origins = ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -29,21 +26,29 @@ class TextInput(BaseModel):
 
 @app.post("/classify/")
 async def classify_text(input: TextInput):
-    # Tokenize the input text
-    inputs = tokenizer(input.text, return_tensors="pt", truncation=True, padding=True, max_length=512)
+    try:
+        # Tokenize the input text
+        inputs = tokenizer(input.text, return_tensors="pt", truncation=True, padding=True, max_length=512)
 
-    # Make predictions
-    model.eval()  # Set the model to evaluation mode
-    with torch.no_grad():
-        outputs = model(**inputs)
+        # Make predictions
+        with torch.no_grad():
+            outputs = model(**inputs)
+        
+        # Get the predicted class
+        logits = outputs.logits
+        probabilities = torch.softmax(logits, dim=1)
+        predicted_class = torch.argmax(probabilities, dim=1).item()
 
-    # Get the predicted label
-    predictions = torch.argmax(outputs.logits, dim=-1)
-    label = predictions.item()
+        # Log the raw outputs for debugging
+        print(f"Logits: {logits}")
+        print(f"Probabilities: {probabilities}")
+        print(f"Predicted class: {predicted_class}")
 
-    # Interpret the results
-    result = "True News" if label == 0 else "Fake News"
-    return {"result": result}
+        # Map the predicted class to a label
+        is_fake = predicted_class == 1  # Assuming class 1 is 'fake' and class 0 is 'real'
+        return {"is_fake": is_fake}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
     import uvicorn
